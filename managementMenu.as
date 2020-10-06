@@ -13,8 +13,8 @@ class ManagementMenu : AFBaseClass {
     }
     
     void ExpansionInit(){
-        RegisterCommand("banMenu", "", "acsess the ban menu", ACCESS_E, @ManagementMenu::banMenu, CMD_SERVER);
-	RegisterCommand("kickMenu", "", "acsess the kick menu", ACCESS_E, @ManagementMenu::kickMenu, CMD_SERVER);
+        RegisterCommand("banMenu", "", "acsess the ban menu", ACCESS_E, @ManagementMenu::banMenu);
+	RegisterCommand("kickMenu", "", "acsess the kick menu", ACCESS_E, @ManagementMenu::kickMenu);
     }
 }
 
