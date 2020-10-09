@@ -5,7 +5,14 @@ void ManagementMenu_Call(){
     managementmenu.RegisterExpansion(managementmenu);
 }
 
+funcdef void ManagementMenu_banMenuDef(AFBaseArguments@);
+funcdef void ManagementMenu_kickMenuDef(AFBaseArguments@);
+funcdef void ManagementMenu_menuCallbackDef(CTextMenu@, CBasePlayer@, int, const CTextMenuItem@);
+
 class ManagementMenu : AFBaseClass {
+	CTextMenu@ menu;
+	ManagementMenu_menuCallbackDef @menCallB;
+	
     void ExpansionInfo(){
         this.AuthorName = "Victorique";
         this.ExpansionName = "Management Utils";
@@ -13,15 +20,15 @@ class ManagementMenu : AFBaseClass {
     }
     
     void ExpansionInit(){
-        RegisterCommand("banMenu", "", "acsess the ban menu", ACCESS_E, @ManagementMenu::banMenu);
-		RegisterCommand("kickMenu", "", "acsess the kick menu", ACCESS_E, @ManagementMenu::kickMenu);
+		ManagementMenu_banMenuDef @banM = ManagementMenu_banMenuDef(this.banMenu);
+		ManagementMenu_kickMenuDef @kickM = ManagementMenu_kickMenuDef(this.kickMenu);
+		
+		@menCallB = ManagementMenu_menuCallbackDef(this.menuCallback);
+		
+		RegisterCommand("banMenu", "", "acsess the ban menu", ACCESS_E, @banM);
+		RegisterCommand("kickMenu", "", "acsess the kick menu", ACCESS_E, @kickM);
     }
-}
-
-namespace ManagementMenu{
-
-	CTextMenu@ menu;
-
+	
 	void banMenu(AFBaseArguments@ AFArgs){
 		makeMenu(true, AFArgs, "ban who");
 	}
@@ -30,8 +37,8 @@ namespace ManagementMenu{
 		makeMenu(false, AFArgs, "kick who");
 	}
 
-	void makeMenu(bool isBan, AFBaseArguments@ AFArgs, string title){
-		@menu = CTextMenu(@MenuCallback);
+	private void makeMenu(bool isBan, AFBaseArguments@ AFArgs, string title){
+		@menu = CTextMenu(@menCallB);
 		menu.SetTitle(title);
 		array<AFBase::AFBaseUser> arr(g_Engine.maxClients);
 		for(int i = 0; i < g_Engine.maxClients; i++){
@@ -72,7 +79,7 @@ namespace ManagementMenu{
 		menu.Open(0, 0, AFArgs.User);
 	}
 
-	void MenuCallback(CTextMenu@ menu, CBasePlayer@ pPlayer, int page, const CTextMenuItem@ item) {
+	private void menuCallback(CTextMenu@ menu, CBasePlayer@ pPlayer, int page, const CTextMenuItem@ item) {
 		if (item !is null && pPlayer !is null){
 			string steamStr;
 			item.m_pUserData.retrieve(steamStr);
@@ -93,7 +100,7 @@ namespace ManagementMenu{
 		}
 	}
 
-	void doBan(string nickName, string steamId, CBasePlayer@ pPlayer){
+	private void doBan(string nickName, string steamId, CBasePlayer@ pPlayer){
 		AFBaseArguments afbArguments;
 		@afbArguments.User = pPlayer;
 		afbArguments.FixedNick = string(pPlayer.pev.netname);
@@ -107,7 +114,7 @@ namespace ManagementMenu{
 		AFBaseBase::ban(@afbArguments);
 	}
 
-	void doKick(string nickName, CBasePlayer@ pPlayer){
+	private void doKick(string nickName, CBasePlayer@ pPlayer){
 		AFBaseArguments afbArguments;
 		@afbArguments.User = pPlayer;
 		afbArguments.FixedNick = string(pPlayer.pev.netname);
